@@ -13,11 +13,30 @@
 #include <vector>
 #include <variant>
 
+/**
+ * SIE file white space between "tokens
+ * */
+bool is_white_space(char ch) {
+    return (ch == ' ') || (ch == 9);
+}
+
+bool is_valid_new_line(char ch) {
+    return (ch == 10);
+}
+
+bool is_optional_new_line(char ch) {
+    return (ch == 13);
+}
+
+bool is_valid_or_optional_new_line(char ch) {
+    return is_valid_new_line(ch) || is_optional_new_line(ch);
+}
+
 auto format_and_output_ch_to_cout = [](char ch) -> void {
-       if (ch == 10) { // SIE file defined new-line control character
+       if (is_valid_new_line(ch)) { // SIE file defined new-line control character
             std::cout << "<" << static_cast<int>(ch) << ">" << '\n'; // Show and perform new-line
         }
-       else if (ch == 13) { // SIE-file NOT new-line but allowed
+       else if (is_optional_new_line(ch)) { // SIE-file NOT new-line but allowed
             std::cout << "<" << static_cast<int>(ch) << ">"; // Show but do NOT perform new line
         }
         else if (    (ch >= ' ')
@@ -82,7 +101,7 @@ int main(int argc, const char * argv[]) {
                     tokens.clear(); // next line
                 }
 
-                if ((ch == 13) || (ch == 10)) {
+                if (is_valid_or_optional_new_line(ch)) {
                     // waiting for #-label any number of new lines are allowed (consume as white space)
                 }
                 else if (ch == '#') {
@@ -93,7 +112,7 @@ int main(int argc, const char * argv[]) {
                     // parse sub-elements (enter sub-elements "mode")
                     are_sub_element_tokens = true;
                 }
-                else if (are_sub_element_tokens && ((ch == ' ') || (ch == 9))) {
+                else if (are_sub_element_tokens && is_white_space(ch)) {
                     // Sub-element tokens are allowed to "begin" with white space (indented)
                 }
                 else if (ch == '}' && are_sub_element_tokens) {
@@ -118,13 +137,13 @@ int main(int argc, const char * argv[]) {
                     // IBM PC 8-bitars extended ASCII (Codepage 437) encoded SIE-file (safe).
                     sToken += ch;
                 }
-                else if ((ch == ' ') || (ch == 9) || (ch == 13)) {
+                else if (is_white_space(ch) || is_optional_new_line(ch)) {
                     // SIE file white-space == end-of-#-token
                     tokens.push_back(sToken); // push #-token
                     sToken = "";                        
                     state = 2; // Continue to parse tokens that are members of found #-element
                 }
-                else if (ch == 10) {
+                else if (is_valid_new_line(ch)) {
                     // End-of-line == End of #-element
                     if (tokens.size() > 0) {
                         tokens.push_back(sToken); // push #-token
@@ -156,10 +175,10 @@ int main(int argc, const char * argv[]) {
 
             case 2: /* Skip white spaces to next member token */ {
 
-                if ((ch == ' ') || (ch == 9) || (ch == 13)) {
+                if (is_white_space(ch) || is_optional_new_line(ch)) {
                     // Skip white spaces
                 }
-                else if (ch == 10) {
+                else if (is_valid_new_line(ch)) {
                     // End of line = end of #-element
                     if (sToken.size() > 0) {
                         tokens.push_back(sToken);
@@ -186,13 +205,13 @@ int main(int argc, const char * argv[]) {
 
             case 3: /* Read content (value) of #-element member token */ {
 
-                if ((ch == ' ') || (ch == 9)) {
+                if (is_white_space(ch)) {
                     // SIE file white-space == end-of-#-token
                     tokens.push_back(sToken); // push #-token
                     sToken = "";
                     state = 2; // Continue to parse tokens that are members of found #-element
                 }
-                else if (ch == 10) {
+                else if (is_valid_new_line(ch)) {
                     // End-of-line == End of #-element
                     tokens.push_back(sToken);
                     sToken = "";
@@ -204,7 +223,7 @@ int main(int argc, const char * argv[]) {
                     std::cout << "\"";
                     sLine.clear();
                 }
-                else if (ch == 13) {
+                else if (is_optional_new_line(ch)) {
                     // Skip optional carrige return
                 }
                 else {
