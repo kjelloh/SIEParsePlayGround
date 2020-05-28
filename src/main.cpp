@@ -61,18 +61,40 @@ auto format_and_output_line_to_cout = [](const std::string& sLine) {
 };
 
 using c_Tokens = std::vector<std::string>;
+using c_SubEntries = std::vector<c_Tokens>;
+
+class c_SIEFileEntry {
+public:
+    c_SIEFileEntry(const c_Tokens tokens) 
+        :  m_entry{tokens}, m_sub_entries{} {}
+
+    bool has_sub_entries() {return m_sub_entries.size() > 0;}
+    c_Tokens const& entry() {return m_entry;}
+    c_SubEntries const& sub_entries() {return m_sub_entries;}
+
+    void add_sub_entry(const c_Tokens sub_entry) {m_sub_entries.push_back(sub_entry);}
+
+private:
+    c_Tokens m_entry;
+    c_SubEntries m_sub_entries;
+};
+
+using c_SIEFileEntries = std::vector<c_SIEFileEntry>;
 
 int main(int argc, const char * argv[]) {
     std::filesystem::path sie_file_path("/Users/kjell-olovhogdal/Documents/Github/SIEParsePlayGround/sie/2326 ITFied 1505-1604.se");
     std::ifstream sie_file(sie_file_path);
-    char ch;
-    sie_file.get(ch);
     unsigned int state = 0;
+    bool are_sub_element_tokens = false;
     std::string sToken{};
     c_Tokens tokens{};
-    bool are_sub_element_tokens = false;
-    int loop_count{0};
-    std::string sLine{};
+    c_SIEFileEntries sie_file_entries{};
+
+    int loop_count{0}; // For Debug trace
+    std::string sLine{}; // For Debug trace
+
+    char ch;
+    sie_file.get(ch);
     while (sie_file.good()) {
 //    while (++loop_count < 1000) {
         sLine.push_back(ch);
@@ -83,17 +105,16 @@ int main(int argc, const char * argv[]) {
         //std::cout << "\nState " << state << "\tsToken = <" << sToken << ">";
         switch (state) {
             case 0: { // Parse beginning of new line
-                /**
-                 * Each line must begin with a #-prefixed label
-                 **/
 
                 if (tokens.size() > 0) {
                     // Trace parsed tokens
                     if (are_sub_element_tokens) {
                         std::cout << "\n\tSUB-TOKENS =";
+                        sie_file_entries.back().add_sub_entry(tokens);
                     }
                     else {
                         std::cout << "\nTOKENS =";
+                        sie_file_entries.push_back(c_SIEFileEntry(tokens));
                     }
                     for (auto& sToken : tokens) {
                         std::cout << " <" << sToken << ">";
@@ -248,7 +269,34 @@ int main(int argc, const char * argv[]) {
             break;
 
         }
-        sie_file.get(ch); // next
+        sie_file.get(ch); // next char
+    }
+
+    // Dump parsed entries
+    for (auto& entry : sie_file_entries) {
+        std::cout << "\n";
+        bool first_token = true;
+        for (auto& token : entry.entry()) {
+            if (!first_token) {
+                std::cout << "\t";
+            }
+            std::cout << token;
+            first_token = false;
+        }
+        if (entry.has_sub_entries()) {
+            for (auto& sub_entry : entry.sub_entries()) {
+                std::cout << "\n\t";
+                bool first_token = true;
+                for (auto& token : sub_entry) {
+                    if (!first_token) {
+                        std::cout << "\t";
+                    }
+                    std::cout << token;
+                    first_token = false;
+                }
+            
+            }
+        }
     }
 
     std::cout << '\n';
