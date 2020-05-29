@@ -82,8 +82,20 @@ private:
 using c_SIEFileEntries = std::vector<c_SIEFileEntry>;
 
 int main(int argc, const char * argv[]) {
-    std::filesystem::path sie_file_path("/Users/kjell-olovhogdal/Documents/Github/SIEParsePlayGround/sie/2326 ITFied 1505-1604.se");
+    std::string sSIEFileName = (argc > 1) ? argv[1] : "../sie/2326 ITFied 1505-1604.se";
+    std::filesystem::path sie_file_path(sSIEFileName);
     std::ifstream sie_file(sie_file_path);
+
+    if (sie_file) {
+        std::cout << "\nWill Open File " << sie_file_path;
+    }
+    else {
+        std::cout << "\nUnknown File " << sie_file_path;
+    }
+    std::cout << "\nPress any key:";
+    char dummy_char;
+    std::cin.get(dummy_char);
+
     unsigned int state = 0;
     bool are_sub_element_tokens = false;
     std::string sToken{};
