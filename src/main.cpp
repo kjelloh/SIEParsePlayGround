@@ -64,6 +64,7 @@ using c_Tokens = std::vector<std::string>;
 using c_SubEntries = std::vector<c_Tokens>;
 
 class c_SIEFileEntry {
+    friend std::ostream& operator<<(std::ostream& os, c_SIEFileEntry file_entry);
 public:
     c_SIEFileEntry(const c_Tokens tokens) 
         :  m_tokens{tokens}, m_sub_entries{} {}
@@ -78,6 +79,33 @@ private:
     c_Tokens m_tokens;
     c_SubEntries m_sub_entries;
 };
+
+std::ostream& operator<<(std::ostream& os, c_SIEFileEntry entry) {
+    os << "\n";
+    bool first_token = true;
+    for (auto& token : entry.tokens()) {
+        if (!first_token) {
+            os << "\t";
+        }
+        os << token;
+        first_token = false;
+    }
+    if (entry.has_sub_entries()) {
+        for (auto& sub_entry : entry.sub_entries()) {
+            os << "\n\t";
+            bool first_token = true;
+            for (auto& token : sub_entry) {
+                if (!first_token) {
+                    os << "\t";
+                }
+                std::cout << token;
+                first_token = false;
+            }
+        
+        }
+    }
+    return os;
+}
 
 using c_SIEFileEntries = std::vector<c_SIEFileEntry>;
 
@@ -274,31 +302,31 @@ c_SIEFileEntries parse_sie_file(std::ifstream& sie_file) {
 
         // Dump parsed entries
         for (auto& entry : sie_file_entries) {
-            std::cout << "\n";
-            bool first_token = true;
-            for (auto& token : entry.tokens()) {
-                if (!first_token) {
-                    std::cout << "\t"; // Token Separator
-                }
-                std::cout << token;
-                first_token = false;
-            }
-            if (entry.has_sub_entries()) {
-                for (auto& sub_entry : entry.sub_entries()) {
-                    std::cout << "\n\t";
-                    bool first_token = true;
-                    for (auto& token : sub_entry) {
-                        if (!first_token) {
-                            std::cout << "\t";
-                        }
-                        std::cout << token;
-                        first_token = false;
-                    }
+        //     std::cout << "\n";
+        //     bool first_token = true;
+        //     for (auto& token : entry.tokens()) {
+        //         if (!first_token) {
+        //             std::cout << "\t"; // Token Separator
+        //         }
+        //         std::cout << token;
+        //         first_token = false;
+        //     }
+        //     if (entry.has_sub_entries()) {
+        //         for (auto& sub_entry : entry.sub_entries()) {
+        //             std::cout << "\n\t";
+        //             bool first_token = true;
+        //             for (auto& token : sub_entry) {
+        //                 if (!first_token) {
+        //                     std::cout << "\t";
+        //                 }
+        //                 std::cout << token;
+        //                 first_token = false;
+        //             }
                 
-                }
-            }
+        //         }
+        //     }
+        std::cout << entry;
         }
-
     }
     return sie_file_entries;
 }
