@@ -304,33 +304,24 @@ c_SIEFileEntries parse_sie_file(std::ifstream& sie_file) {
 }
 
 int main(int argc, const char * argv[]) {
+    // Choose and open SIE file
     std::string sSIEFileName = (argc > 1) ? argv[1] : "../sie/2326 ITFied 1505-1604.se";
     std::filesystem::path sie_file_path(sSIEFileName);
     std::ifstream sie_file(sie_file_path);
 
+    // User feed back
     if (sie_file) {
         std::cout << "\nWill Open File " << sie_file_path;
     }
     else {
         std::cout << "\nUnknown File " << sie_file_path;
     }
-    std::cout << "\nPress any key:";
+    std::cout << "\nPress any key...";
     char dummy_char;
     std::cin.get(dummy_char);
 
-    unsigned int state = 0;
-    bool are_sub_element_tokens = false;
-    std::string sToken{};
-    c_Tokens tokens{};
-    c_SIEFileEntries sie_file_entries{};
-
-    int loop_count{0}; // For Debug trace
-    std::string sLine{}; // For Debug trace
-
-    char ch;
-    sie_file.get(ch);
-
-    sie_file_entries = parse_sie_file(sie_file);
+    // Parse the SIE file
+    c_SIEFileEntries sie_file_entries = parse_sie_file(sie_file);
 
     // Dump parsed entries
     for (auto& entry : sie_file_entries) {
@@ -359,6 +350,7 @@ int main(int argc, const char * argv[]) {
         }
     }
 
+    // Exit
     std::cout << '\n';
     return 0;
 }
