@@ -302,30 +302,7 @@ c_SIEFileEntries parse_sie_file(std::ifstream& sie_file) {
 
         // Dump parsed entries
         for (auto& entry : sie_file_entries) {
-        //     std::cout << "\n";
-        //     bool first_token = true;
-        //     for (auto& token : entry.tokens()) {
-        //         if (!first_token) {
-        //             std::cout << "\t"; // Token Separator
-        //         }
-        //         std::cout << token;
-        //         first_token = false;
-        //     }
-        //     if (entry.has_sub_entries()) {
-        //         for (auto& sub_entry : entry.sub_entries()) {
-        //             std::cout << "\n\t";
-        //             bool first_token = true;
-        //             for (auto& token : sub_entry) {
-        //                 if (!first_token) {
-        //                     std::cout << "\t";
-        //                 }
-        //                 std::cout << token;
-        //                 first_token = false;
-        //             }
-                
-        //         }
-        //     }
-        std::cout << entry;
+            std::cout << entry; // use custom << operator for the entry
         }
     }
     return sie_file_entries;
