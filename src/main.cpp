@@ -66,16 +66,16 @@ using c_SubEntries = std::vector<c_Tokens>;
 class c_SIEFileEntry {
 public:
     c_SIEFileEntry(const c_Tokens tokens) 
-        :  m_entry{tokens}, m_sub_entries{} {}
+        :  m_tokens{tokens}, m_sub_entries{} {}
 
     bool has_sub_entries() {return m_sub_entries.size() > 0;}
-    c_Tokens const& entry() {return m_entry;}
+    c_Tokens const& tokens() {return m_tokens;}
     c_SubEntries const& sub_entries() {return m_sub_entries;}
 
     void add_sub_entry(const c_Tokens sub_entry) {m_sub_entries.push_back(sub_entry);}
 
 private:
-    c_Tokens m_entry;
+    c_Tokens m_tokens;
     c_SubEntries m_sub_entries;
 };
 
@@ -276,9 +276,9 @@ c_SIEFileEntries parse_sie_file(std::ifstream& sie_file) {
         for (auto& entry : sie_file_entries) {
             std::cout << "\n";
             bool first_token = true;
-            for (auto& token : entry.entry()) {
+            for (auto& token : entry.tokens()) {
                 if (!first_token) {
-                    std::cout << "\t";
+                    std::cout << "\t"; // Token Separator
                 }
                 std::cout << token;
                 first_token = false;
@@ -327,7 +327,7 @@ int main(int argc, const char * argv[]) {
     for (auto& entry : sie_file_entries) {
         std::cout << "\n";
         bool first_token = true;
-        for (auto& token : entry.entry()) {
+        for (auto& token : entry.tokens()) {
             if (!first_token) {
                 std::cout << "\t";
             }
