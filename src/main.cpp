@@ -12,6 +12,7 @@
 #include <string>
 #include <vector>
 #include <variant>
+#include <optional>
 
 /**
  * SIE file white space between "tokens
@@ -111,6 +112,10 @@ using c_SIEFileEntries = std::vector<c_SIEFileEntry>;
 
 c_SIEFileEntries parse_sie_file(std::ifstream& sie_file) {
     c_SIEFileEntries sie_file_entries{};
+
+    std::cout << "\nSIE Parse to BEGIN - Press any key...";
+    char dummy_char;
+    std::cin.get(dummy_char);
 
     if (sie_file) {
         unsigned int state = 0;
@@ -299,13 +304,43 @@ c_SIEFileEntries parse_sie_file(std::ifstream& sie_file) {
             }
             sie_file.get(ch); // next char
         }
-
-        // Dump parsed entries
-        for (auto& entry : sie_file_entries) {
-            std::cout << entry; // use custom << operator for the entry
-        }
     }
+
+    std::cout << "\nSIE Parse END - Press any key...";
+    std::cin.get(dummy_char);
+
     return sie_file_entries;
+}
+
+class c_SIEFileAmount {
+
+};
+
+
+
+struct c_AnnualReportEntry {
+    std::string m_caption;
+    c_SIEFileAmount m_value;
+};
+
+c_SIEFileAmount get_IB_Amount(const c_SIEFileEntries& sie_file_entries,int year_index,std::string account_number) {
+    c_SIEFileAmount result;
+    return result;
+}
+
+c_AnnualReportEntry create_annual_report_entry(std::string caption, c_SIEFileAmount amount) {
+    return  {caption,amount};
+}
+         
+using c_AnnualReport = std::vector<c_AnnualReportEntry>;
+
+c_AnnualReport create_annual_report(const c_SIEFileEntries& sie_file_entries) {
+    c_AnnualReport result;
+    // Förändringar i eget kapital / Vid årets ingång / Aktiekapital
+    result.push_back(create_annual_report_entry(
+         "Förändringar i eget kapital / Vid årets ingång / Aktiekapital"
+        ,get_IB_Amount(sie_file_entries,0,"2081")));
+    return result;
 }
 
 int main(int argc, const char * argv[]) {
@@ -329,9 +364,19 @@ int main(int argc, const char * argv[]) {
     c_SIEFileEntries sie_file_entries = parse_sie_file(sie_file);
 
     // Dump parsed entries
+    const int no_entries_per_page = 40;
+    int page_entry_count = 0;
     for (auto& entry : sie_file_entries) {
+        if (++page_entry_count >= no_entries_per_page) {
+            std::cout << "\nPage Pause - Press any key...";
+            char dummy_char;
+            std::cin.get(dummy_char);
+            page_entry_count = 0;
+        }
         std::cout << entry;
     }
+
+    c_AnnualReport annual_report = create_annual_report(sie_file_entries);
 
     // Exit
     std::cout << '\n';
