@@ -13,6 +13,7 @@
 #include <vector>
 #include <variant>
 #include <optional>
+#include <algorithm>
 
 /**
  * SIE file white space between "tokens
@@ -71,8 +72,8 @@ public:
         :  m_tokens{tokens}, m_sub_entries{} {}
 
     bool has_sub_entries() {return m_sub_entries.size() > 0;}
-    c_Tokens const& tokens() {return m_tokens;}
-    c_SubEntries const& sub_entries() {return m_sub_entries;}
+    c_Tokens const& tokens() const {return m_tokens;}
+    c_SubEntries const& sub_entries() const {return m_sub_entries;}
 
     void add_sub_entry(const c_Tokens sub_entry) {m_sub_entries.push_back(sub_entry);}
 
@@ -312,23 +313,46 @@ c_SIEFileEntries parse_sie_file(std::ifstream& sie_file) {
     return sie_file_entries;
 }
 
-class c_SIEFileAmount {
-
+struct c_SIEFileAmount {
+    std::string m_amount;
 };
 
-
+using c_OptionalSIEFileAmount = std::optional<c_SIEFileAmount>;
 
 struct c_AnnualReportEntry {
     std::string m_caption;
-    c_SIEFileAmount m_value;
+    c_OptionalSIEFileAmount m_value;
 };
 
-c_SIEFileAmount get_IB_Amount(const c_SIEFileEntries& sie_file_entries,int year_index,std::string account_number) {
-    c_SIEFileAmount result;
+std::ostream& operator<<(std::ostream& os, c_AnnualReportEntry entry) {
+    os << entry.m_caption << "\t";
+    if (entry.m_value) {
+        os << entry.m_value->m_amount;
+    }
+    else {
+        os << "NULL";       
+    }
+    return os;
+}
+
+c_OptionalSIEFileAmount get_IB_Amount(const c_SIEFileEntries& sie_file_entries,int year_index,std::string account_number) {
+    c_OptionalSIEFileAmount result;
+    auto iter = std::find_if(
+         sie_file_entries.begin()
+        ,sie_file_entries.end()
+        ,[year_index, account_number](const c_SIEFileEntry& entry) {
+            return (     (entry.tokens()[0] == "#IB")
+                     and (entry.tokens()[2] == account_number)
+                     and (entry.tokens()[1] == std::to_string(year_index)));
+        }
+    );
+    if (iter != sie_file_entries.end()) {
+        result = {iter->tokens()[3]};
+    }
     return result;
 }
 
-c_AnnualReportEntry create_annual_report_entry(std::string caption, c_SIEFileAmount amount) {
+c_AnnualReportEntry create_annual_report_entry(std::string caption, c_OptionalSIEFileAmount amount) {
     return  {caption,amount};
 }
          
@@ -339,7 +363,7 @@ c_AnnualReport create_annual_report(const c_SIEFileEntries& sie_file_entries) {
     // Förändringar i eget kapital / Vid årets ingång / Aktiekapital
     result.push_back(create_annual_report_entry(
          "Förändringar i eget kapital / Vid årets ingång / Aktiekapital"
-        ,get_IB_Amount(sie_file_entries,0,"2081")));
+        ,get_IB_Amount(sie_file_entries,0,"2081")));    
     return result;
 }
 
@@ -377,6 +401,13 @@ int main(int argc, const char * argv[]) {
     }
 
     c_AnnualReport annual_report = create_annual_report(sie_file_entries);
+
+    // Dump the annual report
+    std::cout << "\nAnnual Report - BEGIN";
+    for (auto const& entry : annual_report) {
+        std::cout << "\n" << entry;
+    }
+    std::cout << "\nAnnual Report - END";
 
     // Exit
     std::cout << '\n';
