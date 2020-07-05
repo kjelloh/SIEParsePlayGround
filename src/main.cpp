@@ -372,13 +372,118 @@ void generate_rtf_file(std::filesystem::path const& sie_file_path,c_AnnualReport
     auto rtf_file_path = sie_file_path;
     rtf_file_path.replace_extension("rtf");
     std::ofstream rtf_file(rtf_file_path);
-    /*
-    {\rtf1\ansi{\fonttbl\f0\fswiss Helvetica;}\f0\pard
-    This is some {\b bold} text.\par
-    }    
-    */
+
+    const std::vector<std::string> rtf_template = {
+         R"({\rtf1\ansi\ansicpg1252\cocoartf2513)"
+        ,R"(\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\froman\fcharset0 Times-Bold;\f1\froman\fcharset0 Times-Roman;})"
+        ,R"({\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red191\green191\blue191;})"
+        ,R"({\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\csgray\c79525;})"
+        ,R"(\paperw11900\paperh16840\margl1440\margr1440\vieww51000\viewh28280\viewkind0)"
+        ,R"(\deftab720)"
+        ,R"(\pard\pardeftab720\sa240\partightenfactor0)"
+
+        ,R"(\f0\b\fs40 \cf2 \expnd0\expndtw0\kerning0)"
+        ,R"(Fler\'e5rs\'f6versikt\)"
+
+        ,R"(\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrr\brdrnil )"
+        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx1728)"
+        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx3456)"
+        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx5184)"
+        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx6912)"
+        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx8640)"
+        ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
+
+        ,R"(\f1\b0\fs24 \cf2 \cell )"
+        ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
+
+        ,R"(\f0\b\fs26\fsmilli13333 \cf2 2019-05-01 - 2020-04-30 )"
+        ,R"(\f1\b0\fs24 \cell )"
+        ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
+
+        ,R"(\f0\b\fs26\fsmilli13333 \cf2 2018-05-01 - 2019-04-30)"
+        ,R"(\f1\b0\fs24 \cell )"
+        ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
+
+        ,R"(\f0\b\fs26\fsmilli13333 \cf2 2017-05-01 - 2018-04-30 )"
+        ,R"(\f1\b0\fs24 \cell )"
+        ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
+
+        ,R"(\f0\b\fs26\fsmilli13333 \cf2 2016-05-01 - 2017-04-30 )"
+        ,R"(\f1\b0\fs24 \cell \row)"
+
+        ,R"(\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil )"
+        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx1728)"
+        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx3456)"
+        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx5184)"
+        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx6912)"
+        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx8640)"
+        ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
+
+        ,R"(\fs26\fsmilli13333 \cf2 Nettooms\'e4ttning)"
+        ,R"(\fs24 \cell )"
+        ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
+        ,R"(\cf2 \cell )"
+        ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
+        ,R"(\cf2 \cell )"
+        ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
+        ,R"(\cf2 \cell )"
+        ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
+        ,R"(\cf2 \cell \row)"
+
+        ,R"(\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil )"
+        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx1728)"
+        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx3456)"
+        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx5184)"
+        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx6912)"
+        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx8640)"
+        ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
+
+        ,R"(\fs26\fsmilli13333 \cf2 Resultat efter finansiella poster )"
+        ,R"(\fs24 \cell )"
+        ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
+        ,R"(\cf2 \cell )"
+        ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
+        ,R"(\cf2 \cell )"
+        ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
+        ,R"(\cf2 \cell )"
+        ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
+        ,R"(\cf2 \cell \row)"
+
+        ,R"(\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil )"
+        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx1728)"
+        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx3456)"
+        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx5184)"
+        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx6912)"
+        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx8640)"
+        ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
+
+        ,R"(\fs26\fsmilli13333 \cf2 Soliditet (%) )"
+        ,R"(\fs24 \)"
+        ,R"(\cell )"
+        ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
+        ,R"(\cf2 \cell )"
+        ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
+        ,R"(\cf2 \cell )"
+        ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
+        ,R"(\cf2 \cell )"
+        ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
+        ,R"(\cf2 \cell \lastrow\row)"
+        ,R"(\pard\pardeftab720\sa240\partightenfactor0)"
+
+        ,R"(\f0\b\fs40 \cf2 \)"
+        ,R"(})"
+    };
+
    std::cout << "\nGenerating file rtf_file -- BEGIN " << rtf_file_path;
-   rtf_file << R"({\rtf1\ansi{\fonttbl\f0\fswiss Helvetica;}\f0\pard This is some {\b bold} text.\par})";
+   // rtf_file << R"({\rtf1\ansi{\fonttbl\f0\fswiss Helvetica;}\f0\pard This is some {\b bold} text.\par})";
+   int index = 0;
+   for (auto const& entry : rtf_template) {
+       switch (index++) {
+           default: {
+               rtf_file << "\n" << entry;
+           }
+       };
+   }
    std::cout << "\nGenerating file rtf_file -- END" << rtf_file_path;
 }
 
