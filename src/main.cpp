@@ -367,6 +367,21 @@ c_AnnualReport create_annual_report(const c_SIEFileEntries& sie_file_entries) {
     return result;
 }
 
+void generate_rtf_file(std::filesystem::path const& sie_file_path,c_AnnualReport const& annual_report) {
+
+    auto rtf_file_path = sie_file_path;
+    rtf_file_path.replace_extension("rtf");
+    std::ofstream rtf_file(rtf_file_path);
+    /*
+    {\rtf1\ansi{\fonttbl\f0\fswiss Helvetica;}\f0\pard
+    This is some {\b bold} text.\par
+    }    
+    */
+   std::cout << "\nGenerating file rtf_file -- BEGIN " << rtf_file_path;
+   rtf_file << R"({\rtf1\ansi{\fonttbl\f0\fswiss Helvetica;}\f0\pard This is some {\b bold} text.\par})";
+   std::cout << "\nGenerating file rtf_file -- END" << rtf_file_path;
+}
+
 int main(int argc, const char * argv[]) {
     // Choose and open SIE file
     std::string sSIEFileName = (argc > 1) ? argv[1] : "../sie/2326 ITFied 1505-1604.se";
@@ -408,6 +423,8 @@ int main(int argc, const char * argv[]) {
         std::cout << "\n" << entry;
     }
     std::cout << "\nAnnual Report - END";
+
+    generate_rtf_file(sie_file_path,annual_report);
 
     // Exit
     std::cout << '\n';

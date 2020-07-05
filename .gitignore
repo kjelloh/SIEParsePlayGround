@@ -32,3 +32,6 @@
 *.app
 src/main.dSYM/Contents/Resources/DWARF/main
 src/main
+.DS_Store
+sie/TheITfiedAB20200625_110240.si
+sie/TheITfiedAB20200625_110240.rtf
