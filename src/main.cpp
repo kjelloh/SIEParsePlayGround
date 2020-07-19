@@ -367,6 +367,39 @@ c_AnnualReport create_annual_report(const c_SIEFileEntries& sie_file_entries) {
     return result;
 }
 
+/**
+ * Adding a row to existing 4 row 5 column table results in the following changes to the rtf-file (Apple TextEdit generated file)
+ * 
+ * -3 {\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red191\green191\blue191;}
+ * +3 {\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red191\green191\blue191;\red191\green191\blue191;}
+ * 
+ * -4 {\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\csgray\c79525;}
+ * +4 {\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\csgray\c79525;\csgray\c79525;}
+ *
+ * -76 \itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil
+ * +76 \itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil
+ * 
+ * + between line 92 & 93 new section
+    \cf2 \cell \row
+
+    \itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil 
+    \clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf4 \clbrdrl\brdrs\brdrw20\brdrcf4 \clbrdrb\brdrs\brdrw20\brdrcf4 \clbrdrr\brdrs\brdrw20\brdrcf4 \clpadl100 \clpadr100 \gaph\cellx1728
+    \clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf4 \clbrdrl\brdrs\brdrw20\brdrcf4 \clbrdrb\brdrs\brdrw20\brdrcf4 \clbrdrr\brdrs\brdrw20\brdrcf4 \clpadl100 \clpadr100 \gaph\cellx3456
+    \clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf4 \clbrdrl\brdrs\brdrw20\brdrcf4 \clbrdrb\brdrs\brdrw20\brdrcf4 \clbrdrr\brdrs\brdrw20\brdrcf4 \clpadl100 \clpadr100 \gaph\cellx5184
+    \clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf4 \clbrdrl\brdrs\brdrw20\brdrcf4 \clbrdrb\brdrs\brdrw20\brdrcf4 \clbrdrr\brdrs\brdrw20\brdrcf4 \clpadl100 \clpadr100 \gaph\cellx6912
+    \clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf4 \clbrdrl\brdrs\brdrw20\brdrcf4 \clbrdrb\brdrs\brdrw20\brdrcf4 \clbrdrr\brdrs\brdrw20\brdrcf4 \clpadl100 \clpadr100 \gaph\cellx8640
+    \pard\intbl\itap1\pardeftab720\sa240\partightenfactor0
+    \cf2 \cell 
+    \pard\intbl\itap1\pardeftab720\sa240\partightenfactor0
+    \cf2 \cell 
+    \pard\intbl\itap1\pardeftab720\sa240\partightenfactor0
+    \cf2 \cell 
+    \pard\intbl\itap1\pardeftab720\sa240\partightenfactor0
+    \cf2 \cell 
+    \pard\intbl\itap1\pardeftab720\sa240\partightenfactor0 
+
+**/
+
 void generate_rtf_file(std::filesystem::path const& sie_file_path,c_AnnualReport const& annual_report) {
 
     auto rtf_file_path = sie_file_path;
@@ -458,8 +491,7 @@ void generate_rtf_file(std::filesystem::path const& sie_file_path,c_AnnualReport
         ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
 
         ,R"(\fs26\fsmilli13333 \cf2 Soliditet (%) )"
-        ,R"(\fs24 \)"
-        ,R"(\cell )"
+        ,R"(\fs24 \cell )"
         ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
         ,R"(\cf2 \cell )"
         ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
