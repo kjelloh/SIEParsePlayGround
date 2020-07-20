@@ -402,6 +402,9 @@ c_AnnualReport create_annual_report(const c_SIEFileEntries& sie_file_entries) {
 
 void generate_rtf_file(std::filesystem::path const& sie_file_path,c_AnnualReport const& annual_report) {
 
+    // this seems to be the "best" (?) microsoft official RTF specification for download?
+    // https://interoperability.blob.core.windows.net/files/Archive_References/[MSFT-RTF].pdf
+
     auto rtf_file_path = sie_file_path;
     rtf_file_path.replace_extension("rtf");
     std::ofstream rtf_file(rtf_file_path);
