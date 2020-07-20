@@ -376,6 +376,91 @@ void generate_rtf_file(std::filesystem::path const& sie_file_path,c_AnnualReport
     // This seesm to be a web based RTF 1.6 specification
     // http://latex2rtf.sourceforge.net/rtfspec.html
 
+    /**
+     * From RTF Specification for <header>
+     * <header>     \rtf <charset> \deff? <fonttbl> <filetbl>? <colortbl>? <stylesheet>? <listtables>? <revtbl>?
+
+     * <fonttbl>    '{' \fonttbl (<fontinfo> | ('{' <fontinfo> '}'))+ '}'
+     * <filetbl>	'{\*' \filetbl ('{' <fileinfo> '}')+ '}'
+     * <colortbl>	'{' \colortbl <colordef>+ '}'
+     * <colordef>	\red ? & \green ? & \blue ? ';'
+     * <stylesheet>	'{' \stylesheet <style>+ '}'
+     * <listtables> <listtable>? <listoverridetable>?
+     * <listtable>	'{' \*\listtable <list>+ '}'
+     * <revtbl>     \*\revtbl
+     * 
+     * Our example <header>
+
+        {\rtf1\ansi\ansicpg1252\cocoartf2513
+        \cocoatextscaling0\cocoaplatform0{\fonttbl\f0\froman\fcharset0 Times-Bold;\f1\froman\fcharset0 Times-Roman;}
+        {\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red191\green191\blue191;}
+        {\*\expandedcolortbl;;\cssrgb\c0\c0\c0;\csgray\c79525;}
+
+     * Our interpretation
+     * Spec:        Our instantiation:
+     * \rtf         \rtf1       // RTF version 1
+     * <charset>    \ansi
+     *              \ansicpg1252
+     * ??           \cocoartf2513
+                    \cocoatextscaling0
+                    \cocoaplatform0
+       \deff?       -
+       <fonttbl>    {
+                    \fonttbl
+                    \f0
+                    \froman
+                    \fcharset0 Times-Bold;
+                    \f1
+                    \froman
+                    \fcharset0 Times-Roman;
+                    }
+     * <filetbl>    -
+     * <colortbl>   {
+     *              \colortbl
+     *                  ;
+     *                  \red255\green255\blue255;
+     *                  \red0\green0\blue0;
+     *                  \red191\green191\blue191;
+     *              }
+     * ??           {
+     * ??           \*\expandedcolortbl
+     * ??           ;
+     * ??           ;
+     * ??           \cssrgb\c0\c0\c0;
+     * ??           \csgray\c79525;
+     * ??           }
+     * 
+     * <stylesheet> -
+     * <listtable>  -
+
+     * From RTF Specification for <document>
+     * <document>	<info>? <docfmt>* <section>+
+     * 
+     * 	    
+     *              \paperw11900
+     *              \paperh16840
+     *              \margl1440
+     *              \margr1440
+     *              \vieww51000
+     *              \viewh27380
+     *              \viewkind1
+     * 
+     * \deftabN     \deftab720
+
+                    \pard
+                    \pardeftab720
+                    \sa240
+                    \partightenfactor0
+                    
+    * From RTF specification http://latex2rtf.sourceforge.net/rtfspec_7.html#rtfspec_tabledef
+    * "There is no RTF table group; instead, tables are specified as paragraph properties."
+
+    <row>	(<tbldef> <cell>+ <tbldef> \row) | (<tbldef> <cell>+ \row) | (<cell>+ <tbldef> \row)
+    <cell>	(<nestrow>? <tbldef>?) & <textpar>+ \cell
+
+     **/
+
+
 /**
  * Adding a row to existing 4 row 5 column table results in the following changes to the rtf-file (Apple TextEdit generated file)
  * 
