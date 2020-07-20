@@ -367,6 +367,15 @@ c_AnnualReport create_annual_report(const c_SIEFileEntries& sie_file_entries) {
     return result;
 }
 
+void generate_rtf_file(std::filesystem::path const& sie_file_path,c_AnnualReport const& annual_report) {
+
+    // This seems to be microsoft official RTF 1.9.1 specification for download?
+    // https://interoperability.blob.core.windows.net/files/Archive_References/[MSFT-RTF].pdf
+    // NOTE: This pdf does not seem to be searhcable (image scanned only?)
+
+    // This seesm to be a web based RTF 1.6 specification
+    // http://latex2rtf.sourceforge.net/rtfspec.html
+
 /**
  * Adding a row to existing 4 row 5 column table results in the following changes to the rtf-file (Apple TextEdit generated file)
  * 
@@ -400,10 +409,49 @@ c_AnnualReport create_annual_report(const c_SIEFileEntries& sie_file_entries) {
 
 **/
 
-void generate_rtf_file(std::filesystem::path const& sie_file_path,c_AnnualReport const& annual_report) {
+/**
+ * Adding a column to existing 4 row 5 column table results in the following changes to the rtf-file (Apple TextEdit generated file)
+ * 
+ * -3 {\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red191\green191\blue191;}
+ * +3 {\colortbl;\red255\green255\blue255;\red0\green0\blue0;\red191\green191\blue191;\red191\green191\blue191;}
+ * 
+ *  - rows 13..16               + rows 13..17
 
-    // this seems to be the "best" (?) microsoft official RTF specification for download?
-    // https://interoperability.blob.core.windows.net/files/Archive_References/[MSFT-RTF].pdf
+    ... = \clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100
+
+    ... \gaph\cellx1728         ... \gaph\cellx1440
+    ... \gaph\cellx3456         ... \gaph\cellx2880
+    ... \gaph\cellx5184         ... \gaph\cellx4320
+    ... \gaph\cellx6912         ... \gaph\cellx5760
+    ... \gaph\cellx8640         ... \gaph\cellx7200
+
+    ... = \clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf4 \clbrdrl\brdrs\brdrw20\brdrcf4 \clbrdrb\brdrs\brdrw20\brdrcf4 \clbrdrr\brdrs\brdrw20\brdrcf4 \clpadl100 \clpadr100
+
+                                ... \gaph\cellx8640
+ *
+ * -36 \f1\b0\fs24 \cell \row
+ * +37 \f1\b0\fs24 \cell 
+ * +38 \pard\intbl\itap1\pardeftab720\sa240\partightenfactor0
+ * +39 \cf2 \cell \row 
+ *
+ *  - rows 39..43               + rows 42..47 
+  
+     ... = \clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100
+
+ * ... \gaph\cellx1728          ... \gaph\cellx1440
+ * ... \gaph\cellx3456          ... \gaph\cellx2880
+ * ... \gaph\cellx5184          ... \gaph\cellx4320
+ * ... \gaph\cellx6912          ... \gaph\cellx5760
+ * ... \gaph\cellx8640          ... \gaph\cellx7200
+ 
+    ... = \clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf4 \clbrdrl\brdrs\brdrw20\brdrcf4 \clbrdrb\brdrs\brdrw20\brdrcf4 \clbrdrr\brdrs\brdrw20\brdrcf4 \clpadl100 \clpadr100
+
+                                ... \gaph\cellx8640
+
+ * This pattern seems to repeat for each table row of the table...
+ * 
+ **/
+
 
     auto rtf_file_path = sie_file_path;
     rtf_file_path.replace_extension("rtf");
@@ -422,11 +470,11 @@ void generate_rtf_file(std::filesystem::path const& sie_file_path,c_AnnualReport
         ,R"(Fler\'e5rs\'f6versikt\)"
 
         ,R"(\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrt\brdrnil \trbrdrl\brdrnil \trbrdrr\brdrnil )"
-        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx1728)"
-        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx3456)"
-        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx5184)"
-        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx6912)"
-        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx8640)"
+        ,R"(... \gaph\cellx1728)"
+        ,R"(... \gaph\cellx3456)"
+        ,R"(... \gaph\cellx5184)"
+        ,R"(... \gaph\cellx6912)"
+        ,R"(... \gaph\cellx8640)"
         ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
 
         ,R"(\f1\b0\fs24 \cf2 \cell )"
@@ -448,11 +496,11 @@ void generate_rtf_file(std::filesystem::path const& sie_file_path,c_AnnualReport
         ,R"(\f1\b0\fs24 \cell \row)"
 
         ,R"(\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil )"
-        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx1728)"
-        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx3456)"
-        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx5184)"
-        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx6912)"
-        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx8640)"
+        ,R"(... \gaph\cellx1728)"
+        ,R"(... \gaph\cellx3456)"
+        ,R"(... \gaph\cellx5184)"
+        ,R"(... \gaph\cellx6912)"
+        ,R"(... \gaph\cellx8640)"
         ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
 
         ,R"(\fs26\fsmilli13333 \cf2 Nettooms\'e4ttning)"
@@ -467,11 +515,11 @@ void generate_rtf_file(std::filesystem::path const& sie_file_path,c_AnnualReport
         ,R"(\cf2 \cell \row)"
 
         ,R"(\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrr\brdrnil )"
-        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx1728)"
-        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx3456)"
-        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx5184)"
-        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx6912)"
-        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx8640)"
+        ,R"(... \gaph\cellx1728)"
+        ,R"(... \gaph\cellx3456)"
+        ,R"(... \gaph\cellx5184)"
+        ,R"(... \gaph\cellx6912)"
+        ,R"(... \gaph\cellx8640)"
         ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
 
         ,R"(\fs26\fsmilli13333 \cf2 Resultat efter finansiella poster )"
@@ -486,11 +534,11 @@ void generate_rtf_file(std::filesystem::path const& sie_file_path,c_AnnualReport
         ,R"(\cf2 \cell \row)"
 
         ,R"(\itap1\trowd \taflags1 \trgaph108\trleft-108 \trbrdrl\brdrnil \trbrdrt\brdrnil \trbrdrr\brdrnil )"
-        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx1728)"
-        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx3456)"
-        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx5184)"
-        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx6912)"
-        ,R"(\clvertalc \clshdrawnil \clbrdrt\brdrs\brdrw20\brdrcf3 \clbrdrl\brdrs\brdrw20\brdrcf3 \clbrdrb\brdrs\brdrw20\brdrcf3 \clbrdrr\brdrs\brdrw20\brdrcf3 \clpadl100 \clpadr100 \gaph\cellx8640)"
+        ,R"(... \gaph\cellx1728)"
+        ,R"(... \gaph\cellx3456)"
+        ,R"(... \gaph\cellx5184)"
+        ,R"(... \gaph\cellx6912)"
+        ,R"(... \gaph\cellx8640)"
         ,R"(\pard\intbl\itap1\pardeftab720\sa240\partightenfactor0)"
 
         ,R"(\fs26\fsmilli13333 \cf2 Soliditet (%) )"
